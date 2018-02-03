@@ -7,10 +7,10 @@ void ATankPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	ATank * Tank = GetControlledTank();
-	if (Tank)
+	ATank * ControlledTank = GetControlledTank();
+	if (ControlledTank)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Controlling %s"), *Tank->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("TankPlayerController possesses: %s"), *ControlledTank->GetName());
 	}
 	else
 	{
