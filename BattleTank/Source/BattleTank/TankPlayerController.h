@@ -31,9 +31,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	float CrosshairYLocation = 0.33333f;
 
+	UPROPERTY(EditAnywhere)
+	float LineTraceRange = 1000000.f;
+
 	//Start the tank barrel moving so that a shot would hit where the crosshair intersects the world
 	void AimTowardsCrosshair();
 
 	//Return an out parameter and true if hits landscape
-	bool bGetSightRayHitLocation(FVector &HitLocation) const;
+	bool GetSightRayHitLocation(FVector &HitLocation) const;
+
 };

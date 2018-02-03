@@ -1,5 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#pragma once
+
+#include "Engine/World.h"
 #include "TankPlayerController.h"
 
 
@@ -24,9 +27,9 @@ void ATankPlayerController::AimTowardsCrosshair()
 	if (!GetControlledTank()) { return; }
 
 	FVector OutHitLocation; //OUT parameter >:(
-	if (bGetSightRayHitLocation(OutHitLocation))
+	if (GetSightRayHitLocation(OutHitLocation))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Look direction: %s"), *OutHitLocation.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("Hit Location: %s"), *OutHitLocation.ToString());
 		//Get world location if line-trace through crosshair
 		//If it hits the landscape
 			//Aim at this point
@@ -36,17 +39,37 @@ void ATankPlayerController::AimTowardsCrosshair()
 
 }
 
-bool ATankPlayerController::bGetSightRayHitLocation(FVector &OutHitLocation) const
+bool ATankPlayerController::GetSightRayHitLocation(FVector &OutHitLocation) const
 {
 	//Find the crosshair position
 	int32 ViewportSizeX, ViewportSizeY;
 	GetViewportSize(ViewportSizeX, ViewportSizeY);
 	FVector2D ScreenLocation = FVector2D((ViewportSizeX * CrosshairXLocation), (ViewportSizeY * CrosshairYLocation));
-	UE_LOG(LogTemp, Warning, TEXT("Screen location: %s"), *ScreenLocation.ToString());
 
 	//"de-project" the screen position of the crosshair to a world postion
-	//line trace along that direction aka look direction
-	//see what we hit up to a maximum range
+	FVector StartLocation;
+	FVector LookDirection;
 
-	return true;
+	bool bDeprojected = DeprojectScreenPositionToWorld(ScreenLocation.X, ScreenLocation.Y, StartLocation, LookDirection);
+
+	if (bDeprojected)
+	{
+		//line trace along that direction aka look direction
+		//see what we hit up to a maximum range
+		FHitResult HitResult;
+		FVector EndLocation = StartLocation + LookDirection * LineTraceRange;
+
+		bool bHit = GetWorld()->LineTraceSingleByChannel(
+			HitResult,
+			StartLocation,
+			EndLocation,
+			ECollisionChannel::ECC_Visibility
+		);
+		if (bHit)
+		{
+			OutHitLocation = HitResult.Location;
+			return true;
+		}
+	}
+	return false;;
 }
