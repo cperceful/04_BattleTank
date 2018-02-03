@@ -2,12 +2,27 @@
 
 #include "GameFramework/Actor.h"
 #include "Engine/World.h"
+#include "GameFramework/PlayerController.h"
 #include "TankAIController.h"
 
 
 void ATankAIController::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ATankAIController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	ATank * PlayerTank = GetPlayerTank();
+	//if a player controlled tank exists
+	if (PlayerTank)
+	{
+		//aim at player controlled tank location
+		GetControlledTank()->AimAt(PlayerTank->GetActorLocation());
+
+		//TODO pewm the player controlled tank
+	}
 }
 
 ATank * ATankAIController::GetControlledTank() const
